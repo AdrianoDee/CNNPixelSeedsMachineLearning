@@ -126,10 +126,10 @@ namespace {
 
       // Load graph
       tensorflow::setLogging("0");
-      std::cout << "GPU" << std::endl;
+
       std::vector<int> pixelDets{0,1,2,3,14,15,16,29,30,31}, layerIds;
 
-      tensorflow::GraphDef* graphDef = tensorflow::loadGraphDef("/lustre/home/adrianodif/CNNDoublets/freeze_models/dense_pix_model_final.pb");
+      tensorflow::GraphDef* graphDef = tensorflow::loadGraphDef("/lustre/home/adrianodif/CNNDoublets/perugia/CMSSW_10_2_6/src/cnn_test_pb.pb");
       tensorflow::Session* session = tensorflow::createSession(graphDef,16);
 
       for (int i = 0; i < graphDef->node_size(); ++i)
@@ -426,11 +426,11 @@ namespace {
       std::chrono::duration<double> elapsedData = finishData - startData;
       std::chrono::duration<double> elapsedPush = finishPush - startPush;
       //
-      // std::cout << "Staring size       : " << numOfDoublets << std::endl;
-      // std::cout << "New size           : " << copyDoublets.size() << std::endl;
-      // std::cout << "Elapsed time (data): " << elapsedData.count() << " s\n";
-      // std::cout << "Elapsed time (inf) : " << elapsedInf.count() << " s\n";
-      // std::cout << "Elapsed time (push): " << elapsedPush.count() << " s\n";
+         std::cout << "Staring size       : " << numOfDoublets << std::endl;
+         std::cout << "New size           : " << copyDoublets.size() << std::endl;
+         std::cout << "Elapsed time (data): " << elapsedData.count() << " s\n";
+         std::cout << "Elapsed time (inf) : " << elapsedInf.count() << " s\n";
+         std::cout << "Elapsed time (push): " << elapsedPush.count() << " s\n";
 
       return copyDoublets;
 
