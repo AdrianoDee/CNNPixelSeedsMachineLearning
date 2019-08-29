@@ -1,7 +1,8 @@
 <use   name="RecoTracker/TkHitPairs"/>
 <use   name="RecoTracker/TkTrackingRegions"/>
 <use   name="RecoPixelVertexing/PixelTriplets"/>
-<library   file="*.cc *.cu" name="RecoTrackerTkHitPairsPlugins">
-  <use name="cuda"/>
+<use   name="tensorflow-cc" />
+<use   name="PhysicsTools/TensorFlow"/>
+<library   file="*.cc" name="RecoTrackerTkHitPairsPlugins">
   <flags   EDM_PLUGIN="1"/>
 </library>
