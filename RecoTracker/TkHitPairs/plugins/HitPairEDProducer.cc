@@ -409,12 +409,19 @@ namespace {
       std::chrono::duration<double> elapsedData = finishData - startData;
       std::chrono::duration<double> elapsedPush = finishPush - startPush;
       //
-         std::cout << "Staring size       : " << numOfDoublets << std::endl;
-         std::cout << "New size           : " << copyDoublets.size() << std::endl;
-         std::cout << "Elapsed time (data): " << elapsedData.count() << " s\n";
-         std::cout << "Elapsed time (inf) : " << elapsedInf.count() << " s\n";
-         std::cout << "Elapsed time (push): " << elapsedPush.count() << " s\n";
+      std::cout << "Staring size       : " << numOfDoublets << std::endl;
+      std::cout << "New size           : " << copyDoublets.size() << std::endl;
+      std::cout << "Elapsed time (data): " << elapsedData.count() << " s\n";
+      std::cout << "Elapsed time (inf) : " << elapsedInf.count() << " s\n";
+      std::cout << "Elapsed time (push): " << elapsedPush.count() << " s\n";
+      
+      vPad = 0;
+      vLab = 0;
+      score = 0;
 
+
+      delete session;
+      
       return copyDoublets;
 
     }
