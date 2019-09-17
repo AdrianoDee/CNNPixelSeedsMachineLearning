@@ -74,7 +74,7 @@ namespace {
       : maxElement_(iConfig.getParameter<unsigned int>("maxElement")),
         maxElementTotal_(iConfig.getParameter<unsigned int>("maxElementTotal")),
         doInference_(iConfig.existsAs<bool>("doInference") ? iConfig.getParameter<bool>("doInference") : true),
-        t_(iConfig.existsAs<double>("thresh") ? iConfig.getParameter<double>("thresh") : 0.1),
+        t_(iConfig.existsAs<double>("thresh") ? iConfig.getParameter<double>("thresh") : 0.16),
         generator_(0, 1, nullptr, maxElement_),  // these indices are dummy, TODO: cleanup HitPairGeneratorFromLayerPair
         layerPairBegins_(iConfig.getParameter<std::vector<unsigned>>("layerPairs")) {
     if (layerPairBegins_.empty())
@@ -112,7 +112,8 @@ namespace {
 
       std::vector<int> pixelDets{0,1,2,3,14,15,16,29,30,31}, layerIds;
 
-      tensorflow::GraphDef* graphDef = tensorflow::loadGraphDef("/lustre/home/adrianodif/CNNDoublets/perugia/CMSSW_10_2_6/src/cnn_test_pb.pb");
+      tensorflow::GraphDef* graphDef = tensorflow::loadGraphDef("/lustrehome/ttedesch/dnn_model_offPU70_1-13-1.pb");
+        //"/lustre/home/adrianodif/CNNDoublets/perugia/dnn_test/models/cnn_doublet/dnn_test.pb");
       tensorflow::Session* session = tensorflow::createSession(graphDef,16);
 
       for (int i = 0; i < graphDef->node_size(); ++i)
@@ -123,7 +124,7 @@ namespace {
         }
       }
 
-      int numOfDoublets = thisDoublets.size(), padSize = 16, cnnLayers = 10, infoSize = 67;
+      int numOfDoublets = thisDoublets.size(), padSize = 16, cnnLayers = 1, infoSize = 67;
       float padHalfSize = 8.0;
       tensorflow::Tensor inputPads(tensorflow::DT_FLOAT, {numOfDoublets,padSize,padSize,cnnLayers*2});
       tensorflow::Tensor inputFeat(tensorflow::DT_FLOAT, {numOfDoublets,infoSize});
@@ -200,10 +201,16 @@ namespace {
         // hitPads.push_back(inPad);
         // hitPads.push_back(outPad);
 
+
+        //Pad Initialization
+        for (int iP = 0; iP < 2*numOfDoublets*padSize*padSize*cnnLayers; ++iP)
+          vPad[iP] = 0.0;
+
         for(int j = 0; j < 2; ++j)
         {
 
-          int padOffset = layerIds[j] * padSize * padSize + j * padSize * padSize * cnnLayers;
+          // int padOffset = layerIds[j] * padSize * padSize + j * padSize * padSize * cnnLayers;
+          int padOffset =  j * padSize * padSize ;
 
           vLab[iLab + infoOffset] = (float)(siHits[j]->globalState()).position.x(); iLab++;
           vLab[iLab + infoOffset] = (float)(siHits[j]->globalState()).position.y(); iLab++;
@@ -303,9 +310,6 @@ namespace {
           // }
 
 
-          //Pad Initialization
-          for (int iP = 0; iP < padSize*padSize*cnnLayers; ++iP)
-            vPad[iP + doubOffset + j*padSize*padSize*cnnLayers] = 0.0;
 
           for (int k = 0; k < thisCluster->size(); ++k)
           {
@@ -315,7 +319,10 @@ namespace {
           }
 
 
+
         }
+
+
 
         // for (int nx = 0; nx < padSize*padSize; ++nx)
         // {
@@ -385,6 +392,12 @@ namespace {
       }
       // std::cout << "Making Inference" << std::endl;
 
+      for (int k=0; k<numOfDoublets*padSize*padSize*cnnLayers*2; ++k){
+
+            //vPad[padOffset+k]=(vPad[padOffset+k+doubOffset]-0.0)/10525.1252954;
+         vPad[k]=(vPad[k]-13382.0011321)/10525.1252954;
+       }
+
       auto finishData = std::chrono::high_resolution_clock::now();
 
       auto startInf = std::chrono::high_resolution_clock::now();
@@ -414,14 +427,14 @@ namespace {
       std::cout << "Elapsed time (data): " << elapsedData.count() << " s\n";
       std::cout << "Elapsed time (inf) : " << elapsedInf.count() << " s\n";
       std::cout << "Elapsed time (push): " << elapsedPush.count() << " s\n";
-      
+
       vPad = 0;
       vLab = 0;
       score = 0;
 
 
       delete session;
-      
+
       return copyDoublets;
 
     }
